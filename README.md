@@ -1,21 +1,31 @@
 # Rosa Ramalho — Galeria AR
 
-Marker-based augmented reality demo. Point a phone camera at the printed marker
-and switch between four 3D models that appear floating above it.
+Marker-based augmented reality demo. One page per 3D model, plus a menu.
 
 ## Files (all must stay in the repo root)
-- `index.html` — the AR page (entry point)
+- `index.html` — menu (start here)
+- `devil.html`, `musician.html`, `monkey.html`, `fish.html` — one AR page per model
 - `devil.glb`, `musician.glb`, `monkey.glb` — stylised *figurado* pieces (animated)
 - `fish.glb` — realistic fish model with textures (animated swim)
-- `rosa-fish.patt` — the marker pattern file
-- `marker_rosa_fish.png` — the printable marker
+- `rosa-fish.patt`, `marker_rosa_fish.png` — the OPTIONAL custom marker (see below)
 
-## How to use
-1. Open the GitHub Pages URL on a phone (Android Chrome or iPhone Safari).
-2. Allow camera access.
-3. Point the camera at the **printed** `marker_rosa_fish.png` (matte paper, ~10–15 cm, flat, well lit).
-4. Tap the buttons at the bottom to switch model.
+## The marker
+By default every page uses the standard **Hiro** marker, which tracks far more
+reliably than a custom one. Print the official Hiro marker from:
+https://ar-js-org.github.io/AR.js-Docs/marker-based/  (the "Hiro" image)
+Print it on matte paper (~10-15 cm), keep it flat and well lit.
 
-## Updating a model
-Replace the matching `.glb` (keep the same filename) and re-upload. A hard refresh
-may be needed to clear the browser cache.
+### To use the custom fish marker instead
+In any page, find these two lines near `<a-scene>`:
+    <!-- <a-marker type="pattern" url="rosa-fish.patt"> -->
+    <a-marker preset="hiro">
+Swap them: uncomment the first, delete the `preset="hiro"` line. Then print
+`marker_rosa_fish.png`.
+
+## Use
+Open the GitHub Pages URL on a phone (Android Chrome / iPhone Safari), allow the
+camera, tap a model, point at the printed marker.
+
+## Troubleshooting
+- Nothing appears: you're not pointing at the *printed* marker, or lighting is poor.
+- Updated a file but see the old one: hard refresh / open in a private tab (cache).

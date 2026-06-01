@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Rosa Ramalho — O Diabo</title>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.0/dist/aframe-extras.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;}
+  #badge{position:fixed;top:14px;left:14px;z-index:9999;background:rgba(251,244,231,.92);
+    color:#2A211B;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;}
+  #hint{position:fixed;left:0;right:0;bottom:18px;z-index:9998;text-align:center;color:#fff;
+    font-size:13px;padding:0 18px;text-shadow:0 1px 4px rgba(0,0,0,.7);pointer-events:none;}
+  #back{position:fixed;top:14px;right:14px;z-index:9999;background:rgba(42,33,27,.8);color:#fff;
+    text-decoration:none;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;}
+</style>
+</head>
+<body>
+  <div id="badge">O Diabo</div>
+  <a id="back" href="index.html">‹ Menu</a>
+  <div id="hint">Aponte a câmara ao <b>marcador Hiro</b> impresso.</div>
+
+  <a-scene vr-mode-ui="enabled: false"
+      renderer="alpha: true; antialias: true; colorManagement: true; physicallyCorrectLights: true"
+      embedded
+      arjs="sourceType: webcam; detectionMode: mono; debugUIEnabled: false;">
+    <a-entity light="type: ambient; intensity: 1.1; color: #fff4e0"></a-entity>
+    <a-entity light="type: directional; intensity: 1.0" position="2 4 3"></a-entity>
+
+    <!-- DEFAULT: rock-solid built-in Hiro marker.
+         To use your custom fish marker instead, replace the next line with:
+         <a-marker type="pattern" url="rosa-fish.patt"> -->
+    <a-marker preset="hiro">
+      <a-entity gltf-model="url(devil.glb)"
+                animation-mixer="clip: alive; loop: repeat"
+                position="0 0.9 0" scale="0.42 0.42 0.42"></a-entity>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+</body>
+</html>
