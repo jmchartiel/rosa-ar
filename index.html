@@ -9,25 +9,15 @@
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;}
-  #badge{
-    position:fixed;top:14px;left:14px;z-index:9999;
-    background:rgba(251,244,231,.92);color:#2A211B;border-radius:999px;
-    padding:8px 14px;font-size:12px;font-weight:600;letter-spacing:.04em;
-  }
-  #hint{
-    position:fixed;left:0;right:0;bottom:92px;z-index:9998;text-align:center;
-    color:#fff;font-size:13px;padding:0 18px;text-shadow:0 1px 4px rgba(0,0,0,.7);pointer-events:none;
-  }
-  #switcher{
-    position:fixed;left:0;right:0;bottom:0;z-index:9999;
-    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
-    padding:14px 12px calc(14px + env(safe-area-inset-bottom));
-    background:linear-gradient(0deg, rgba(42,33,27,.88), rgba(42,33,27,0));
-  }
-  .pick{
-    border:none;border-radius:999px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;
-    background:rgba(251,244,231,.9);color:#2A211B;transition:.15s;
-  }
+  #badge{position:fixed;top:14px;left:14px;z-index:9999;background:rgba(251,244,231,.92);
+    color:#2A211B;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600;letter-spacing:.04em;}
+  #hint{position:fixed;left:0;right:0;bottom:92px;z-index:9998;text-align:center;color:#fff;
+    font-size:13px;padding:0 18px;text-shadow:0 1px 4px rgba(0,0,0,.7);pointer-events:none;}
+  #switcher{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:8px;
+    justify-content:center;flex-wrap:wrap;padding:14px 12px calc(14px + env(safe-area-inset-bottom));
+    background:linear-gradient(0deg, rgba(42,33,27,.88), rgba(42,33,27,0));}
+  .pick{border:none;border-radius:999px;padding:11px 16px;font-size:13px;font-weight:600;
+    cursor:pointer;background:rgba(251,244,231,.9);color:#2A211B;transition:.15s;}
   .pick.on{background:#C0492B;color:#fff;}
 </style>
 </head>
@@ -46,49 +36,47 @@
       vr-mode-ui="enabled: false"
       renderer="alpha: true; antialias: true; colorManagement: true; physicallyCorrectLights: true"
       embedded
-      arjs="sourceType: webcam; detectionMode: mono; patternRatio: 0.5; debugUIEnabled: false;">
+      arjs="sourceType: webcam; detectionMode: mono; patternRatio: 0.5; trackingMethod: best; debugUIEnabled: false;">
 
     <a-entity light="type: ambient; intensity: 1.1; color: #fff4e0"></a-entity>
     <a-entity light="type: directional; intensity: 1.0" position="2 4 3"></a-entity>
 
-    <a-marker type="pattern" url="rosa-fish.patt" smooth="true" smoothCount="6" smoothTolerance="0.02" smoothThreshold="3">
-      <!-- single model entity; JS swaps its src / clip / transform -->
-      <a-entity id="model" position="0 0.4 0"></a-entity>
+    <!-- Light smoothing: responsive but not jittery -->
+    <a-marker type="pattern" url="rosa-fish.patt"
+              smooth="true" smoothCount="3" smoothTolerance="0.01" smoothThreshold="2">
+
+      <!-- All four models pre-placed with their correct clip+scale baked in.
+           We only toggle visibility, so animations always bind correctly. -->
+      <a-entity id="devil" gltf-model="url(devil.glb)"
+                animation-mixer="clip: alive; loop: repeat"
+                position="0 0.9 0" scale="0.42 0.42 0.42"></a-entity>
+
+      <a-entity id="musician" gltf-model="url(musician.glb)"
+                animation-mixer="clip: alive; loop: repeat"
+                position="0 0.9 0" scale="0.42 0.42 0.42" visible="false"></a-entity>
+
+      <a-entity id="monkey" gltf-model="url(monkey.glb)"
+                animation-mixer="clip: alive; loop: repeat"
+                position="0 0.9 0" scale="0.42 0.42 0.42" visible="false"></a-entity>
+
+      <a-entity id="fish" gltf-model="url(fish.glb)"
+                animation-mixer="clip: swim; loop: repeat"
+                position="0 0.6 0" scale="0.7 0.7 0.7" visible="false"></a-entity>
+
     </a-marker>
 
     <a-entity camera></a-entity>
   </a-scene>
 
 <script>
-  // per-model settings: file, animation clip name, scale, vertical lift
-  const MODELS = {
-    devil:    { src: "devil.glb",    clip: "alive", scale: 0.42, y: 0.9 },
-    musician: { src: "musician.glb", clip: "alive", scale: 0.42, y: 0.9 },
-    monkey:   { src: "monkey.glb",   clip: "alive", scale: 0.42, y: 0.9 },
-    fish:     { src: "fish.glb",     clip: "swim",  scale: 0.7,  y: 0.6 }
-  };
-  const model = document.getElementById('model');
-
+  const KEYS = ["devil","musician","monkey","fish"];
   function show(key){
-    const m = MODELS[key];
-    model.removeAttribute('animation-mixer');
-    model.setAttribute('gltf-model', 'url(' + m.src + ')');
-    model.setAttribute('scale', m.scale + ' ' + m.scale + ' ' + m.scale);
-    model.setAttribute('position', '0 ' + m.y + ' 0');
-    // attach the mixer once the new model has loaded, so the right clip plays
-    model.addEventListener('model-loaded', function once(){
-      model.setAttribute('animation-mixer', 'clip: ' + m.clip + '; loop: repeat');
-      model.removeEventListener('model-loaded', once);
-    });
+    KEYS.forEach(k => document.getElementById(k).setAttribute('visible', k === key));
     document.querySelectorAll('.pick').forEach(b =>
       b.classList.toggle('on', b.dataset.key === key));
   }
-
   document.querySelectorAll('.pick').forEach(b =>
     b.addEventListener('click', () => show(b.dataset.key)));
-
-  // start with the devil
-  show('devil');
 </script>
 </body>
 </html>
