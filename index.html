@@ -3,28 +3,44 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Rosa Ramalho — Peixe em Realidade Aumentada</title>
+<title>Rosa Ramalho — Galeria em Realidade Aumentada</title>
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.0/dist/aframe-extras.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
 <style>
-  html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,sans-serif;}
-  #hint{
-    position:fixed;left:0;right:0;bottom:0;z-index:9999;
-    background:linear-gradient(0deg, rgba(42,33,27,.82), rgba(42,33,27,0));
-    color:#fff;text-align:center;padding:26px 18px 18px;font-size:14px;line-height:1.5;pointer-events:none;
-  }
-  #hint b{color:#E0A02E;}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;}
   #badge{
     position:fixed;top:14px;left:14px;z-index:9999;
     background:rgba(251,244,231,.92);color:#2A211B;border-radius:999px;
     padding:8px 14px;font-size:12px;font-weight:600;letter-spacing:.04em;
   }
+  #hint{
+    position:fixed;left:0;right:0;bottom:92px;z-index:9998;text-align:center;
+    color:#fff;font-size:13px;padding:0 18px;text-shadow:0 1px 4px rgba(0,0,0,.7);pointer-events:none;
+  }
+  #switcher{
+    position:fixed;left:0;right:0;bottom:0;z-index:9999;
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    padding:14px 12px calc(14px + env(safe-area-inset-bottom));
+    background:linear-gradient(0deg, rgba(42,33,27,.88), rgba(42,33,27,0));
+  }
+  .pick{
+    border:none;border-radius:999px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;
+    background:rgba(251,244,231,.9);color:#2A211B;transition:.15s;
+  }
+  .pick.on{background:#C0492B;color:#fff;}
 </style>
 </head>
 <body>
-  <div id="badge">Rosa Ramalho · AR</div>
-  <div id="hint">Aponte a câmara ao <b>marcador impresso</b> para o peixe aparecer.</div>
+  <div id="badge">Rosa Ramalho · Galeria AR</div>
+  <div id="hint">Aponte a câmara ao <b>marcador impresso</b> e escolha uma peça em baixo.</div>
+
+  <div id="switcher">
+    <button class="pick on" data-key="devil">O Diabo</button>
+    <button class="pick" data-key="musician">O Músico</button>
+    <button class="pick" data-key="monkey">O Macaco</button>
+    <button class="pick" data-key="fish">O Peixe</button>
+  </div>
 
   <a-scene
       vr-mode-ui="enabled: false"
@@ -36,16 +52,43 @@
     <a-entity light="type: directional; intensity: 1.0" position="2 4 3"></a-entity>
 
     <a-marker type="pattern" url="rosa-fish.patt" smooth="true" smoothCount="6" smoothTolerance="0.02" smoothThreshold="3">
-      <a-entity
-          gltf-model="url(fish.glb)"
-          animation-mixer="clip: swim; loop: repeat"
-          position="0 0.6 0"
-          rotation="0 0 0"
-          scale="0.7 0.7 0.7">
-      </a-entity>
+      <!-- single model entity; JS swaps its src / clip / transform -->
+      <a-entity id="model" position="0 0.4 0"></a-entity>
     </a-marker>
 
     <a-entity camera></a-entity>
   </a-scene>
+
+<script>
+  // per-model settings: file, animation clip name, scale, vertical lift
+  const MODELS = {
+    devil:    { src: "devil.glb",    clip: "alive", scale: 0.42, y: 0.9 },
+    musician: { src: "musician.glb", clip: "alive", scale: 0.42, y: 0.9 },
+    monkey:   { src: "monkey.glb",   clip: "alive", scale: 0.42, y: 0.9 },
+    fish:     { src: "fish.glb",     clip: "swim",  scale: 0.7,  y: 0.6 }
+  };
+  const model = document.getElementById('model');
+
+  function show(key){
+    const m = MODELS[key];
+    model.removeAttribute('animation-mixer');
+    model.setAttribute('gltf-model', 'url(' + m.src + ')');
+    model.setAttribute('scale', m.scale + ' ' + m.scale + ' ' + m.scale);
+    model.setAttribute('position', '0 ' + m.y + ' 0');
+    // attach the mixer once the new model has loaded, so the right clip plays
+    model.addEventListener('model-loaded', function once(){
+      model.setAttribute('animation-mixer', 'clip: ' + m.clip + '; loop: repeat');
+      model.removeEventListener('model-loaded', once);
+    });
+    document.querySelectorAll('.pick').forEach(b =>
+      b.classList.toggle('on', b.dataset.key === key));
+  }
+
+  document.querySelectorAll('.pick').forEach(b =>
+    b.addEventListener('click', () => show(b.dataset.key)));
+
+  // start with the devil
+  show('devil');
+</script>
 </body>
 </html>
