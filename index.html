@@ -2,43 +2,39 @@
 <html lang="pt">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rosa Ramalho — Galeria em Realidade Aumentada</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Rosa Ramalho — Peixe em Realidade Aumentada</title>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.0/dist/aframe-extras.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
 <style>
-  :root{--terracotta:#C0492B;--ochre:#E0A02E;--teal:#1F6F6B;--ink:#2A211B;--cream:#F4E9D8;}
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:system-ui,-apple-system,sans-serif;color:var(--ink);min-height:100vh;
-    background:radial-gradient(120% 90% at 50% 0%, #FCF6EA 0%, var(--cream) 55%, #EAD9BF 100%);
-    padding:40px 22px 60px;}
-  header{text-align:center;max-width:560px;margin:0 auto 26px;}
-  .eyebrow{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--terracotta);font-weight:700;}
-  h1{font-size:clamp(26px,7vw,40px);line-height:1.05;margin:8px 0;font-weight:800;}
-  h1 em{font-style:italic;font-weight:500;color:var(--teal);}
-  p.sub{font-size:14px;color:#6a5c4d;line-height:1.5;}
-  .grid{max-width:520px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  a.card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-    text-decoration:none;color:var(--ink);background:#FBF4E7;border-radius:20px;padding:26px 16px;
-    box-shadow:0 6px 18px rgba(42,33,27,.08);border:2px solid transparent;transition:.15s;font-weight:600;}
-  a.card:hover{border-color:var(--ochre);transform:translateY(-3px);}
-  .dot{width:46px;height:46px;border-radius:14px;box-shadow:inset 0 -6px 10px rgba(0,0,0,.15);}
-  .sub2{font-size:11px;color:#8a7c6c;font-weight:500;}
-  footer{max-width:520px;margin:26px auto 0;font-size:12px;color:#8a7c6c;text-align:center;line-height:1.6;}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;}
+  #badge{position:fixed;top:14px;left:14px;z-index:9999;background:rgba(251,244,231,.92);
+    color:#2A211B;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;}
+  #hint{position:fixed;left:0;right:0;bottom:18px;z-index:9998;text-align:center;color:#fff;
+    font-size:13px;padding:0 18px;text-shadow:0 1px 4px rgba(0,0,0,.7);pointer-events:none;}
 </style>
 </head>
 <body>
-  <header>
-    <div class="eyebrow">Barcelos · Rosa Ramalho · 1888–1977</div>
-    <h1>Galeria <em>em Realidade Aumentada</em></h1>
-    <p class="sub">Escolha uma peça, aponte a câmara ao marcador impresso e veja-a ganhar vida.</p>
-  </header>
+  <div id="badge">Rosa Ramalho · AR</div>
+  <div id="hint">Aponte a câmara ao <b>marcador impresso</b>.</div>
 
-  <div class="grid">
-    <a class="card" href="devil.html"><span class="dot" style="background:linear-gradient(145deg,#E0532E,#A8321B)"></span>O Diabo<span class="sub2">Mundo dos Monstros</span></a>
-    <a class="card" href="musician.html"><span class="dot" style="background:linear-gradient(145deg,#2FA39B,#15605B)"></span>O Músico<span class="sub2">Homem a tocar viola</span></a>
-    <a class="card" href="monkey.html"><span class="dot" style="background:linear-gradient(145deg,#F0B83A,#C98213)"></span>O Macaco<span class="sub2">Macaco da corrente</span></a>
-    <a class="card" href="fish.html"><span class="dot" style="background:linear-gradient(145deg,#8FA9B8,#4A6877)"></span>O Peixe<span class="sub2">Modelo realista</span></a>
-  </div>
+  <a-scene vr-mode-ui="enabled: false"
+      renderer="alpha: true; antialias: true; colorManagement: true; physicallyCorrectLights: true"
+      embedded
+      arjs="sourceType: webcam; detectionMode: mono; patternRatio: 0.5; debugUIEnabled: false;">
 
-  <footer>Cada página abre a câmara e procura o <b>marcador Hiro</b>. Imprima-o em papel mate (~10–15&nbsp;cm), mantenha-o plano e bem iluminado.</footer>
+    <a-entity light="type: ambient; intensity: 1.1; color: #fff4e0"></a-entity>
+    <a-entity light="type: directional; intensity: 1.0" position="2 4 3"></a-entity>
+
+    <a-marker type="pattern" url="rosa-fish.patt">
+      <a-entity gltf-model="url(fish.glb)"
+                animation-mixer="clip: swim; loop: repeat"
+                position="0 1.4 0"
+                scale="2.6 2.6 2.6"></a-entity>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+  </a-scene>
 </body>
 </html>
